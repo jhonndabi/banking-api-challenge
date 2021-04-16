@@ -39,7 +39,10 @@ defmodule BankingApiChallenge.MixProject do
       {:phoenix_pubsub, "~> 2.0"},
       {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
-      {:jason, "~> 1.0"}
+      {:jason, "~> 1.0"},
+      {:argon2_elixir, "~> 2.0"},
+      {:bcrypt_elixir, "~> 2.2"},
+      {:pbkdf2_elixir, "~> 1.2"}
     ]
   end
 
