@@ -32,13 +32,7 @@ defmodule BankingApiChallenge.SignUps.Inputs.SignUpInput do
     |> validate_length(:name, min: @name_min_length)
     |> validate_email(:email)
     |> validate_email(:email_confirmation)
-    |> validate_fields([:email, :email_confirmation], fn changes, changeset ->
-      if changes[:email] == changes[:email_confirmation] do
-        changeset
-      else
-        add_error(changeset, :email_and_confirmation, "Email and confirmation must be the same")
-      end
-    end)
+    |> validate_fields([:email, :email_confirmation], &check_email_confirmation/2)
   end
 
   defp changeset_password_credentials(model, params) do
@@ -46,5 +40,13 @@ defmodule BankingApiChallenge.SignUps.Inputs.SignUpInput do
     |> cast(params, @password_credentials_required_fields)
     |> validate_required(@password_credentials_required_fields)
     |> validate_length(:password, min: @password_min_length)
+  end
+
+  defp check_email_confirmation(changes, changeset) do
+    if changes[:email] == changes[:email_confirmation] do
+      changeset
+    else
+      add_error(changeset, :email_and_confirmation, "Email and confirmation must be the same")
+    end
   end
 end
