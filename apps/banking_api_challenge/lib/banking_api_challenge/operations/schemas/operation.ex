@@ -33,12 +33,14 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
     |> validate_required(@required)
     |> validate_number(:balance, greater_than_or_equal_to: 0)
     |> validate_inclusion(:operation_type, @acceptable_operation_types)
-    |> validate_fields([:account_in, :account_out], fn changes, changeset ->
-      if changes[:account_in] != nil || changes[:account_out] != nil do
-        changeset
-      else
-        add_error(changeset, :account, "At least one account is required, on account_in or account_out")
-      end
-    end)
+    |> validate_fields([:account_in, :account_out], &check_operation_has_at_least_one_account/2)
+  end
+
+  defp check_operation_has_at_least_one_account(changes, changeset) do
+    if changes[:account_in] != nil || changes[:account_out] != nil do
+      changeset
+    else
+      add_error(changeset, :account, "At least one account is required, on account_in or account_out")
+    end
   end
 end
