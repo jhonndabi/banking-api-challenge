@@ -18,7 +18,7 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "operations" do
-    field :operation_type, :integer
+    field :operation_type, :string
     field :amount, :integer
 
     belongs_to :account_in, Account
