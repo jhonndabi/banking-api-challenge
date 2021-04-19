@@ -21,8 +21,8 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
     field :operation_type, :string
     field :amount, :integer
 
-    belongs_to :account_in, Account
-    belongs_to :account_out, Account
+    belongs_to :account_source, Account
+    belongs_to :account_target, Account
 
     timestamps()
   end
@@ -30,22 +30,22 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
   def changeset(model \\ %__MODULE__{}, params) do
     model
     |> cast(params, @required ++ @optional)
-    |> cast_assoc(:account_in)
-    |> cast_assoc(:account_out)
+    |> cast_assoc(:account_target)
+    |> cast_assoc(:account_source)
     |> validate_required(@required)
     |> validate_number(:amount, greater_than_or_equal_to: 0)
     |> validate_inclusion(:operation_type, @acceptable_operation_types)
-    |> validate_fields([:account_in, :account_out], &check_operation_has_at_least_one_account/2)
+    |> validate_fields([:account_target, :account_source], &check_operation_has_at_least_one_account/2)
   end
 
   defp check_operation_has_at_least_one_account(changes, changeset) do
-    if changes[:account_in] != nil || changes[:account_out] != nil do
+    if changes[:account_target] != nil || changes[:account_source] != nil do
       changeset
     else
       add_error(
         changeset,
         :account,
-        "At least one account is required, on account_in or account_out"
+        "At least one account is required, on account_target or account_source"
       )
     end
   end

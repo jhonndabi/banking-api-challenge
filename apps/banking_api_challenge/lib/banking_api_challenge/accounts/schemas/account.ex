@@ -21,8 +21,8 @@ defmodule BankingApiChallenge.Accounts.Schemas.Account do
     field :account_number, :integer
     field :balance, :integer, default: 0
 
-    has_many :operations_in, Operation, foreign_key: :account_in_id
-    has_many :operations_out, Operation, foreign_key: :account_out_id
+    has_many :operations_source, Operation, foreign_key: :account_source_id
+    has_many :operations_target, Operation, foreign_key: :account_target_id
 
     belongs_to :user, User
 

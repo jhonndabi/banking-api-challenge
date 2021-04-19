@@ -6,13 +6,13 @@ defmodule BankingApiChallenge.Operations.Inputs.TransferInput do
 
   import Ecto.Changeset
 
-  @required_fields [:account_in_id, :account_out_id, :amount]
+  @required_fields [:account_source_id, :account_target_id, :amount]
 
   @primary_key false
   embedded_schema do
     field :operation_type, :string, default: "transfer"
-    field :account_in_id, :binary_id
-    field :account_out_id, :binary_id
+    field :account_source_id, :binary_id
+    field :account_target_id, :binary_id
     field :amount, :integer
   end
 
