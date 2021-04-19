@@ -27,8 +27,8 @@ defmodule BankingApiChallenge.SignUps do
          {:ok, user} <- do_sign_up(changeset) do
       {:ok, user}
     else
-      %{valid?: false} = changeset ->
-        {:error, changeset}
+      %{valid?: false} = changeset -> {:error, changeset}
+      {:error, reason} -> {:error, reason}
     end
   rescue
     Ecto.ConstraintError ->
@@ -51,7 +51,7 @@ defmodule BankingApiChallenge.SignUps do
   defp make_initial_deposit(%Account{} = account) do
     %DepositInput{
       account_id: account.id,
-      amount: @initial_deposit_amount,
+      amount: @initial_deposit_amount
     }
     |> Operations.make_deposit()
   end

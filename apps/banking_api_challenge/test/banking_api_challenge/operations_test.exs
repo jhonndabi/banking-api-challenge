@@ -2,6 +2,7 @@ defmodule BankingApiChallenge.OperationsTest do
   use BankingApiChallenge.DataCase, async: true
 
   alias BankingApiChallenge.Operations.Inputs.DepositInput
+  alias BankingApiChallenge.Operations.Inputs.WithdrawInput
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
   alias BankingApiChallenge.Users.Schemas.User
@@ -16,10 +17,11 @@ defmodule BankingApiChallenge.OperationsTest do
 
       {:ok, account} = Accounts.generate_new_account(user)
 
-      Operations.make_deposit(%DepositInput{
+      %DepositInput{
         account_id: account.id,
-        amount: 1_000_00,
-      })
+        amount: 1_000_00
+      }
+      |> Operations.make_deposit()
 
       {:ok, account: account}
     end
@@ -27,7 +29,12 @@ defmodule BankingApiChallenge.OperationsTest do
     test "fail if withdraw amount is greater than account balance", state do
       account = state[:account]
 
-      {:error, result} = Operations.make_withdraw(account.id, 1_000_01)
+      {:error, result} =
+        %WithdrawInput{
+          account_id: account.id,
+          amount: 1_000_01
+        }
+        |> Operations.make_withdraw()
 
       assert "must be greater than or equal to 0" in errors_on(result).balance
 
@@ -41,7 +48,11 @@ defmodule BankingApiChallenge.OperationsTest do
     test "successfully make withdraw with valid input", state do
       account = state[:account]
 
-      Operations.make_withdraw(account.id, 250_00)
+      %WithdrawInput{
+        account_id: account.id,
+        amount: 250_00
+      }
+      |> Operations.make_withdraw()
 
       query = from(a in Account, where: a.id == ^account.id)
 
@@ -64,10 +75,11 @@ defmodule BankingApiChallenge.OperationsTest do
       {:ok, account_in} = Accounts.generate_new_account(user1)
       {:ok, account_out} = Accounts.generate_new_account(user2)
 
-      Operations.make_deposit(%DepositInput{
+      %DepositInput{
         account_id: account_out.id,
-        amount: 1_000_00,
-      })
+        amount: 1_000_00
+      }
+      |> Operations.make_deposit()
 
       {:ok, account_in: account_in, account_out: account_out}
     end

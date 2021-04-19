@@ -2,6 +2,7 @@ defmodule BankingApiChallenge.Operations do
   import Ecto.Query
 
   alias BankingApiChallenge.Operations.Inputs.DepositInput
+  alias BankingApiChallenge.Operations.Inputs.WithdrawInput
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Operations.Schemas.Operation
   alias BankingApiChallenge.Repo
@@ -13,8 +14,8 @@ defmodule BankingApiChallenge.Operations do
          {:ok, operation} <- do_make_deposit(input.account_id, input.amount) do
       {:ok, operation}
     else
-      %{valid?: false} = changeset ->
-        {:error, changeset}
+      %{valid?: false} = changeset -> {:error, changeset}
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -31,7 +32,19 @@ defmodule BankingApiChallenge.Operations do
     |> Repo.transaction()
   end
 
-  def make_withdraw(account_id, amount) when is_integer(amount) and amount > 0 do
+  def make_withdraw(%WithdrawInput{} = input) do
+    params = Map.from_struct(input)
+
+    with %{valid?: true} <- WithdrawInput.changeset(params),
+         {:ok, operation} <- do_make_withdraw(input.account_id, input.amount) do
+      {:ok, operation}
+    else
+      %{valid?: false} = changeset -> {:error, changeset}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp do_make_withdraw(account_id, amount) when is_integer(amount) and amount > 0 do
     fn ->
       with {:ok, account} <- get_account_with_lock(account_id),
            {:ok, operation} <- build_withdraw_operation(account, amount) |> Repo.insert(),
@@ -44,11 +57,13 @@ defmodule BankingApiChallenge.Operations do
     |> Repo.transaction()
   end
 
-  def make_transfer(account_in_id, account_out_id, amount) when is_integer(amount) and amount > 0 do
+  def make_transfer(account_in_id, account_out_id, amount)
+      when is_integer(amount) and amount > 0 do
     fn ->
       with {:ok, account_in} <- get_account_with_lock(account_in_id),
            {:ok, account_out} <- get_account_with_lock(account_out_id),
-           {:ok, operation} <- build_transfer_operation(account_in, account_out, amount) |> Repo.insert(),
+           {:ok, operation} <-
+             build_transfer_operation(account_in, account_out, amount) |> Repo.insert(),
            {:ok, _account} <- increase_balance(account_in, amount),
            {:ok, _account} <- decrease_balance(account_out, amount) do
         operation
