@@ -19,7 +19,7 @@ defmodule BankingApiChallenge.Accounts.Schemas.Account do
   schema "accounts" do
     field :agency, :integer
     field :account_number, :integer
-    field :balance, :integer, default: 0
+    field :balance, :integer, default: 0, redact: true
 
     has_many :operations_source, Operation, foreign_key: :account_source_id
     has_many :operations_target, Operation, foreign_key: :account_target_id

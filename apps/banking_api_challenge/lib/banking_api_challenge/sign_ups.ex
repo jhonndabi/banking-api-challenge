@@ -25,7 +25,7 @@ defmodule BankingApiChallenge.SignUps do
 
     with %{valid?: true} = changeset <- User.changeset(params),
          {:ok, user} <- do_sign_up(changeset) do
-      {:ok, user}
+      user
     else
       %{valid?: false} = changeset -> {:error, changeset}
       {:error, reason} -> {:error, reason}
