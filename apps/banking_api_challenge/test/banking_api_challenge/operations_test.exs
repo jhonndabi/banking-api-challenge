@@ -25,12 +25,7 @@ defmodule BankingApiChallenge.OperationsTest do
 
       {:error, result} = Operations.make_withdraw(account.id, 1_000_01)
 
-      expected_error = [
-        balance: {"must be greater than or equal to %{number}",
-        [validation: :number, kind: :greater_than_or_equal_to, number: 0]}
-      ]
-
-      assert expected_error == result.errors
+      assert "must be greater than or equal to 0" in errors_on(result).balance
 
       query = from(a in Account, where: a.id == ^account.id)
 
@@ -49,6 +44,53 @@ defmodule BankingApiChallenge.OperationsTest do
       account = Repo.one(query)
 
       assert account.balance == 750_00
+    end
+  end
+
+  describe "make_transfer/1" do
+    setup do
+      user1 =
+        %User{name: "random name 1", email: "#{Ecto.UUID.generate()}@email.com"}
+        |> Repo.insert!()
+
+      user2 =
+        %User{name: "random name 2", email: "#{Ecto.UUID.generate()}@email.com"}
+        |> Repo.insert!()
+
+      {:ok, account_in} = Accounts.generate_new_account(user1)
+      {:ok, account_out} = Accounts.generate_new_account(user2)
+
+      Operations.make_deposit(account_out.id, 1_000_00)
+
+      {:ok, account_in: account_in, account_out: account_out}
+    end
+
+    test "fail if withdraw amount is greater than account balance", state do
+      account_in = state[:account_in]
+      account_out = state[:account_out]
+
+      {:error, result} = Operations.make_transfer(account_in.id, account_out.id, 1_000_01)
+
+      assert "must be greater than or equal to 0" in errors_on(result).balance
+
+      account_in = from(a in Account, where: a.id == ^account_in.id) |> Repo.one()
+      account_out = from(a in Account, where: a.id == ^account_out.id) |> Repo.one()
+
+      assert account_in.balance == 0
+      assert account_out.balance == 1_000_00
+    end
+
+    test "successfully make transfer with valid input", state do
+      account_in = state[:account_in]
+      account_out = state[:account_out]
+
+      Operations.make_transfer(account_in.id, account_out.id, 300_00)
+
+      account_in = from(a in Account, where: a.id == ^account_in.id) |> Repo.one()
+      account_out = from(a in Account, where: a.id == ^account_out.id) |> Repo.one()
+
+      assert account_in.balance == 300_00
+      assert account_out.balance == 700_00
     end
   end
 end

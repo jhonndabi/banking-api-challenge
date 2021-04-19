@@ -31,6 +31,21 @@ defmodule BankingApiChallenge.Operations do
     |> Repo.transaction()
   end
 
+  def make_transfer(account_in_id, account_out_id, amount) when is_integer(amount) and amount > 0 do
+    fn ->
+      with {:ok, account_in} <- get_account_with_lock(account_in_id),
+           {:ok, account_out} <- get_account_with_lock(account_out_id),
+           {:ok, operation} <- build_transfer_operation(account_in, account_out, amount) |> Repo.insert(),
+           {:ok, _account} <- increase_balance(account_in, amount),
+           {:ok, _account} <- decrease_balance(account_out, amount) do
+        operation
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end
+    |> Repo.transaction()
+  end
+
   defp get_account_with_lock(account_id) do
     account =
       Account
@@ -67,6 +82,15 @@ defmodule BankingApiChallenge.Operations do
     Operation.changeset(%{
       operation_type: "withdraw",
       account_out: Map.from_struct(account),
+      amount: amount
+    })
+  end
+
+  defp build_transfer_operation(%Account{} = account_in, %Account{} = account_out, amount) do
+    Operation.changeset(%{
+      operation_type: "transfer",
+      account_in: Map.from_struct(account_in),
+      account_out: Map.from_struct(account_out),
       amount: amount
     })
   end
