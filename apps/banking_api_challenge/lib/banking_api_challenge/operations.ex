@@ -3,6 +3,7 @@ defmodule BankingApiChallenge.Operations do
 
   alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Operations.Inputs.WithdrawInput
+  alias BankingApiChallenge.Operations.Inputs.TransferInput
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Operations.Schemas.Operation
   alias BankingApiChallenge.Repo
@@ -57,8 +58,21 @@ defmodule BankingApiChallenge.Operations do
     |> Repo.transaction()
   end
 
-  def make_transfer(account_in_id, account_out_id, amount)
-      when is_integer(amount) and amount > 0 do
+  def make_transfer(%TransferInput{} = input) do
+    params = Map.from_struct(input)
+
+    with %{valid?: true} <- TransferInput.changeset(params),
+         {:ok, operation} <-
+           do_make_transfer(input.account_in_id, input.account_out_id, input.amount) do
+      {:ok, operation}
+    else
+      %{valid?: false} = changeset -> {:error, changeset}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp do_make_transfer(account_in_id, account_out_id, amount)
+       when is_integer(amount) and amount > 0 do
     fn ->
       with {:ok, account_in} <- get_account_with_lock(account_in_id),
            {:ok, account_out} <- get_account_with_lock(account_out_id),

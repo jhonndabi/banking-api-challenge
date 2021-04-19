@@ -3,6 +3,7 @@ defmodule BankingApiChallenge.OperationsTest do
 
   alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Operations.Inputs.WithdrawInput
+  alias BankingApiChallenge.Operations.Inputs.TransferInput
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
   alias BankingApiChallenge.Users.Schemas.User
@@ -88,7 +89,13 @@ defmodule BankingApiChallenge.OperationsTest do
       account_in = state[:account_in]
       account_out = state[:account_out]
 
-      {:error, result} = Operations.make_transfer(account_in.id, account_out.id, 1_000_01)
+      {:error, result} =
+        %TransferInput{
+          account_in_id: account_in.id,
+          account_out_id: account_out.id,
+          amount: 1_000_01
+        }
+        |> Operations.make_transfer()
 
       assert "must be greater than or equal to 0" in errors_on(result).balance
 
@@ -103,7 +110,12 @@ defmodule BankingApiChallenge.OperationsTest do
       account_in = state[:account_in]
       account_out = state[:account_out]
 
-      Operations.make_transfer(account_in.id, account_out.id, 300_00)
+      %TransferInput{
+        account_in_id: account_in.id,
+        account_out_id: account_out.id,
+        amount: 300_00
+      }
+      |> Operations.make_transfer()
 
       account_in = from(a in Account, where: a.id == ^account_in.id) |> Repo.one()
       account_out = from(a in Account, where: a.id == ^account_out.id) |> Repo.one()
