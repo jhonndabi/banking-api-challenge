@@ -1,16 +1,29 @@
 defmodule BankingApiChallenge.Operations do
   import Ecto.Query
 
+  alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Operations.Schemas.Operation
   alias BankingApiChallenge.Repo
 
-  def make_deposit(account_id, amount) when is_integer(amount) and amount > 0 do
+  def make_deposit(%DepositInput{} = input) do
+    params = Map.from_struct(input)
+
+    with %{valid?: true} <- DepositInput.changeset(params),
+         {:ok, operation} <- do_make_deposit(input.account_id, input.amount) do
+      {:ok, operation}
+    else
+      %{valid?: false} = changeset ->
+        {:error, changeset}
+    end
+  end
+
+  defp do_make_deposit(account_id, amount) when is_integer(amount) and amount > 0 do
     fn ->
       with {:ok, account} <- get_account_with_lock(account_id),
            {:ok, operation} <- build_deposit_operation(account, amount) |> Repo.insert(),
            {:ok, _account} <- increase_balance(account, operation.amount) do
-        operation
+        {:ok, operation}
       else
         {:error, reason} -> Repo.rollback(reason)
       end

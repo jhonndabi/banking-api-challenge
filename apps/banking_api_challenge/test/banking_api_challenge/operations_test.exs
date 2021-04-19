@@ -1,6 +1,7 @@
 defmodule BankingApiChallenge.OperationsTest do
   use BankingApiChallenge.DataCase, async: true
 
+  alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
   alias BankingApiChallenge.Users.Schemas.User
@@ -15,7 +16,10 @@ defmodule BankingApiChallenge.OperationsTest do
 
       {:ok, account} = Accounts.generate_new_account(user)
 
-      Operations.make_deposit(account.id, 1_000_00)
+      Operations.make_deposit(%DepositInput{
+        account_id: account.id,
+        amount: 1_000_00,
+      })
 
       {:ok, account: account}
     end
@@ -60,7 +64,10 @@ defmodule BankingApiChallenge.OperationsTest do
       {:ok, account_in} = Accounts.generate_new_account(user1)
       {:ok, account_out} = Accounts.generate_new_account(user2)
 
-      Operations.make_deposit(account_out.id, 1_000_00)
+      Operations.make_deposit(%DepositInput{
+        account_id: account_out.id,
+        amount: 1_000_00,
+      })
 
       {:ok, account_in: account_in, account_out: account_out}
     end
