@@ -5,7 +5,9 @@ defmodule BankingApiChallengeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", BankingApiChallengeWeb do
+  scope "/api/v1", BankingApiChallengeWeb do
     pipe_through :api
+
+    post "/signups", SignUpController, :sign_up
   end
 end

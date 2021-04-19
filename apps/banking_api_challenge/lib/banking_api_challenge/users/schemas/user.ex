@@ -15,7 +15,7 @@ defmodule BankingApiChallenge.Users.Schemas.User do
 
   @name_min_length 5
 
-  @derive {Jason.Encoder, except: [:__meta__]}
+  @derive {Jason.Encoder, except: [:__meta__, :password_credential, :account]}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
