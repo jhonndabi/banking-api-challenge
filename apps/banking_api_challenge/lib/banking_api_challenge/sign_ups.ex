@@ -8,13 +8,21 @@ defmodule BankingApiChallenge.SignUps do
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
   alias BankingApiChallenge.Repo
-  alias Ecto.Multi
 
   @initial_deposit_amount 1_000_00
 
   def sign_up(%SignUpInput{} = input) do
-    with %{valid?: true} = changeset <- User.changeset(input),
-          {:ok, user} <- %{create_user: do_sign_up(changeset)} do
+    params = %{
+      name: input.name,
+      email: input.email,
+      email_confirmation: input.email_confirmation,
+      password_credential: %{
+        password: input.password_credential.password
+      }
+    }
+
+    with %{valid?: true} = changeset <- User.changeset(params),
+         {:ok, user} <- do_sign_up(changeset) do
       {:ok, user}
     else
       %{valid?: false} = changeset ->
@@ -26,16 +34,15 @@ defmodule BankingApiChallenge.SignUps do
   end
 
   defp do_sign_up(changeset) do
-    Multi.new()
-    |> Multi.run(:create_user, fn _changes, _ ->
-      Repo.insert(changeset)
-    end)
-    |> Multi.run(:create_account, fn changes, _ ->
-      Accounts.generate_new_account(changes.create_user)
-    end)
-    |> Multi.run(:make_initial_deposit, fn changes, _ ->
-      Operations.make_deposit(changes.create_account, @initial_deposit_amount)
-    end)
+    fn ->
+      with {:ok, user} <- Repo.insert(changeset),
+           {:ok, account} <- Accounts.generate_new_account(user),
+           {:ok, deposit} <- Operations.make_deposit(account.id, @initial_deposit_amount) do
+        deposit
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end
     |> Repo.transaction()
   end
 end

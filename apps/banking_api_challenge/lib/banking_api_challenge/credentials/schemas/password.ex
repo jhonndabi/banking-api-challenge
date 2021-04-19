@@ -12,8 +12,10 @@ defmodule BankingApiChallenge.Credentials.Schemas.Password do
   @default_salt 16
   @allowed_algorithms ~w(argon2 bcrypt pbkdf2)
 
-  @required [:password, :hashed_value, :user_id]
+  @required [:password, :hashed_value]
   @optional [:algorithm, :salt]
+
+  @password_min_length 8
 
   @derive {Jason.Encoder, except: [:__meta__]}
 
@@ -36,6 +38,7 @@ defmodule BankingApiChallenge.Credentials.Schemas.Password do
     |> validate_inclusion(:algorithm, @allowed_algorithms)
     |> hash_password()
     |> validate_required(@required)
+    |> validate_length(:password, min: @password_min_length)
   end
 
   defp hash_password(
@@ -45,7 +48,6 @@ defmodule BankingApiChallenge.Credentials.Schemas.Password do
          } = changeset
        )
        when is_binary(password) do
-
     algorithm = Map.get(changes, :algorithm, @default_algorithm)
     salt = Map.get(changes, :salt, @default_salt)
 

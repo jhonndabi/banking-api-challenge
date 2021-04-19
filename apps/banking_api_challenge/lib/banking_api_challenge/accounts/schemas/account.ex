@@ -9,7 +9,7 @@ defmodule BankingApiChallenge.Accounts.Schemas.Account do
   alias BankingApiChallenge.Users.Schemas.User
   alias BankingApiChallenge.Operations.Schemas.Operation
 
-  @required [:agency, :account_number, :balance]
+  @required [:agency, :account_number, :balance, :user_id]
   @optional []
 
   @derive {Jason.Encoder, except: [:__meta__]}

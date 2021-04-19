@@ -10,7 +10,7 @@ defmodule BankingApiChallenge.Users.Schemas.User do
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Credentials.Schemas.Password
 
-  @required [:name, :email, :password_credential]
+  @required [:name, :email]
   @optional []
 
   @name_min_length 5
@@ -32,7 +32,7 @@ defmodule BankingApiChallenge.Users.Schemas.User do
   def changeset(model \\ %__MODULE__{}, params) do
     model
     |> cast(params, @required ++ @optional)
-    |> cast_assoc(:password_credential, with: &Password.changeset/2)
+    |> cast_assoc(:password_credential, required: true)
     |> validate_required(@required)
     |> validate_length(:name, min: @name_min_length)
     |> validate_email(:email)

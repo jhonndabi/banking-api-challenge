@@ -11,7 +11,7 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
 
   @acceptable_operation_types ~w(deposit transfer withdraw)
   @required [:operation_type, :amount]
-  @optional [:account_in, :account_out]
+  @optional []
 
   @derive {Jason.Encoder, except: [:__meta__]}
 
@@ -30,8 +30,10 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
   def changeset(model \\ %__MODULE__{}, params) do
     model
     |> cast(params, @required ++ @optional)
+    |> cast_assoc(:account_in)
+    |> cast_assoc(:account_out)
     |> validate_required(@required)
-    |> validate_number(:balance, greater_than_or_equal_to: 0)
+    |> validate_number(:amount, greater_than_or_equal_to: 0)
     |> validate_inclusion(:operation_type, @acceptable_operation_types)
     |> validate_fields([:account_in, :account_out], &check_operation_has_at_least_one_account/2)
   end
@@ -40,7 +42,11 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
     if changes[:account_in] != nil || changes[:account_out] != nil do
       changeset
     else
-      add_error(changeset, :account, "At least one account is required, on account_in or account_out")
+      add_error(
+        changeset,
+        :account,
+        "At least one account is required, on account_in or account_out"
+      )
     end
   end
 end
