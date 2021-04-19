@@ -3,7 +3,9 @@ defmodule BankingApiChallenge.SignUps do
   Domain public functions about the sign up context.
   """
 
+  alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Users.Schemas.User
+  alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.SignUps.Inputs.SignUpInput
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
@@ -25,8 +27,8 @@ defmodule BankingApiChallenge.SignUps do
          {:ok, user} <- do_sign_up(changeset) do
       {:ok, user}
     else
-      %{valid?: false} = changeset ->
-        {:error, changeset}
+      %{valid?: false} = changeset -> {:error, changeset}
+      {:error, reason} -> {:error, reason}
     end
   rescue
     Ecto.ConstraintError ->
@@ -37,12 +39,20 @@ defmodule BankingApiChallenge.SignUps do
     fn ->
       with {:ok, user} <- Repo.insert(changeset),
            {:ok, account} <- Accounts.generate_new_account(user),
-           {:ok, deposit} <- Operations.make_deposit(account.id, @initial_deposit_amount) do
-        deposit
+           {:ok, _deposit} <- make_initial_deposit(account) do
+        {:ok, user}
       else
         {:error, reason} -> Repo.rollback(reason)
       end
     end
     |> Repo.transaction()
+  end
+
+  defp make_initial_deposit(%Account{} = account) do
+    %DepositInput{
+      account_id: account.id,
+      amount: @initial_deposit_amount
+    }
+    |> Operations.make_deposit()
   end
 end
