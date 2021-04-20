@@ -26,7 +26,7 @@ defmodule BankingApiChallengeWeb.SignUpControllerTest do
            } = json_response(conn, 200)
     end
 
-    test "fail with 412 when email is already taken", ctx do
+    test "fail with 409 when email is already taken", ctx do
       email = "#{Ecto.UUID.generate()}@email.com"
 
       input = %SignUpInput{
@@ -43,7 +43,7 @@ defmodule BankingApiChallengeWeb.SignUpControllerTest do
 
       assert ctx.conn
              |> post("/api/v1/signups", input)
-             |> json_response(412) == %{
+             |> json_response(409) == %{
                "description" => "Email already taken",
                "type" => "conflict"
              }
