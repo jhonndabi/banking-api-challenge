@@ -73,55 +73,55 @@ defmodule BankingApiChallenge.OperationsTest do
         %User{name: "random name 2", email: "#{Ecto.UUID.generate()}@email.com"}
         |> Repo.insert!()
 
-      {:ok, account_target} = Accounts.generate_new_account(user1)
-      {:ok, account_source} = Accounts.generate_new_account(user2)
+      {:ok, target_account} = Accounts.generate_new_account(user1)
+      {:ok, source_account} = Accounts.generate_new_account(user2)
 
       %DepositInput{
-        account_id: account_source.id,
+        account_id: source_account.id,
         amount: 1_000_00
       }
       |> Operations.make_deposit()
 
-      {:ok, account_source: account_source, account_target: account_target}
+      {:ok, source_account: source_account, target_account: target_account}
     end
 
     test "fail if transfer amount is greater than source account balance", state do
-      account_source = state[:account_source]
-      account_target = state[:account_target]
+      source_account = state[:source_account]
+      target_account = state[:target_account]
 
       {:error, result} =
         %TransferInput{
-          account_source_id: account_source.id,
-          account_target_id: account_target.id,
+          source_account_id: source_account.id,
+          target_account_id: target_account.id,
           amount: 1_000_01
         }
         |> Operations.make_transfer()
 
       assert "must be greater than or equal to 0" in errors_on(result).balance
 
-      account_target = from(a in Account, where: a.id == ^account_target.id) |> Repo.one()
-      account_source = from(a in Account, where: a.id == ^account_source.id) |> Repo.one()
+      target_account = from(a in Account, where: a.id == ^target_account.id) |> Repo.one()
+      source_account = from(a in Account, where: a.id == ^source_account.id) |> Repo.one()
 
-      assert account_source.balance == 1_000_00
-      assert account_target.balance == 0
+      assert source_account.balance == 1_000_00
+      assert target_account.balance == 0
     end
 
     test "successfully make transfer with valid input", state do
-      account_source = state[:account_source]
-      account_target = state[:account_target]
+      source_account = state[:source_account]
+      target_account = state[:target_account]
 
       %TransferInput{
-        account_source_id: account_source.id,
-        account_target_id: account_target.id,
+        source_account_id: source_account.id,
+        target_account_id: target_account.id,
         amount: 300_00
       }
       |> Operations.make_transfer()
 
-      account_target = from(a in Account, where: a.id == ^account_target.id) |> Repo.one()
-      account_source = from(a in Account, where: a.id == ^account_source.id) |> Repo.one()
+      target_account = from(a in Account, where: a.id == ^target_account.id) |> Repo.one()
+      source_account = from(a in Account, where: a.id == ^source_account.id) |> Repo.one()
 
-      assert account_source.balance == 700_00
-      assert account_target.balance == 300_00
+      assert source_account.balance == 700_00
+      assert target_account.balance == 300_00
     end
   end
 end

@@ -13,7 +13,7 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
   @required [:operation_type, :amount]
   @optional []
 
-  @derive {Jason.Encoder, except: [:__meta__, :account_source, :account_target]}
+  @derive {Jason.Encoder, except: [:__meta__, :source_account, :target_account]}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -21,8 +21,8 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
     field :operation_type, :string
     field :amount, :integer
 
-    belongs_to :account_source, Account
-    belongs_to :account_target, Account
+    belongs_to :source_account, Account
+    belongs_to :target_account, Account
 
     timestamps()
   end
@@ -30,22 +30,22 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
   def changeset(model \\ %__MODULE__{}, params) do
     model
     |> cast(params, @required ++ @optional)
-    |> cast_assoc(:account_target)
-    |> cast_assoc(:account_source)
+    |> cast_assoc(:target_account)
+    |> cast_assoc(:source_account)
     |> validate_required(@required)
     |> validate_number(:amount, greater_than_or_equal_to: 0)
     |> validate_inclusion(:operation_type, @acceptable_operation_types)
-    |> validate_fields([:account_target, :account_source], &check_operation_has_at_least_one_account/2)
+    |> validate_fields([:target_account, :source_account], &check_operation_has_at_least_one_account/2)
   end
 
   defp check_operation_has_at_least_one_account(changes, changeset) do
-    if changes[:account_target] != nil || changes[:account_source] != nil do
+    if changes[:target_account] != nil || changes[:source_account] != nil do
       changeset
     else
       add_error(
         changeset,
         :account,
-        "At least one account is required, on account_target or account_source"
+        "At least one account is required, on target_account or source_account"
       )
     end
   end

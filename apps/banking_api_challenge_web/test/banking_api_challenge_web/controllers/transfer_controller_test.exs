@@ -12,22 +12,22 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
       source_user = %User{name: "source name", email: "source@email.com"} |> Repo.insert!()
       target_user = %User{name: "target name", email: "target@email.com"} |> Repo.insert!()
 
-      {:ok, account_source} = Accounts.generate_new_account(source_user)
-      {:ok, account_target} = Accounts.generate_new_account(target_user)
+      {:ok, source_account} = Accounts.generate_new_account(source_user)
+      {:ok, target_account} = Accounts.generate_new_account(target_user)
 
       %DepositInput{
-        account_id: account_source.id,
+        account_id: source_account.id,
         amount: 1_000_00
       }
       |> Operations.make_deposit()
 
-      {:ok, accounts: %{source: account_source, target: account_target}}
+      {:ok, accounts: %{source: source_account, target: target_account}}
     end
 
     test "fail with 400 when account balance is less than transfer amount", %{conn: conn, accounts: accounts} do
       input = %{
-        account_source_id: accounts.source.id,
-        account_target_id: accounts.target.id,
+        source_account_id: accounts.source.id,
+        target_account_id: accounts.target.id,
         amount: 1_000_01
       }
 
@@ -42,8 +42,8 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
 
     test "successfully transfer with valid input", %{conn: conn, accounts: accounts} do
       input = %{
-        account_source_id: accounts.source.id,
-        account_target_id: accounts.target.id,
+        source_account_id: accounts.source.id,
+        target_account_id: accounts.target.id,
         amount: 299_99
       }
 
