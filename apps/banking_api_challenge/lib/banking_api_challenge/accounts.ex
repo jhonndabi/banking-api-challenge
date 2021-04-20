@@ -11,7 +11,6 @@ defmodule BankingApiChallenge.Accounts do
       Account.changeset(%{
         agency: Enum.random(@agency_random_range),
         account_number: Enum.random(@account_number_random_range),
-        user: user,
         user_id: user.id
       })
 

@@ -34,5 +34,6 @@ defmodule BankingApiChallenge.Accounts.Schemas.Account do
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
     |> validate_number(:balance, greater_than_or_equal_to: 0)
+    |> unique_constraint([:agency, :account_number])
   end
 end
