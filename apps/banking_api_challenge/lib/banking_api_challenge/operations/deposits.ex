@@ -6,21 +6,9 @@ defmodule BankingApiChallenge.Operations.Deposits do
   alias BankingApiChallenge.Repo
 
   def deposit(%DepositInput{} = input) do
-    params = Map.from_struct(input)
-
-    with %{valid?: true} <- DepositInput.changeset(params),
-         {:ok, operation} <- do_deposit(input.account_id, input.amount) do
-      {:ok, operation}
-    else
-      %{valid?: false} = changeset -> {:error, changeset}
-      {:error, reason} -> {:error, reason}
-    end
-  end
-
-  defp do_deposit(account_id, amount) when is_integer(amount) and amount > 0 do
     fn ->
-      with {:ok, account} <- Accounts.get_account_with_lock(account_id),
-           {:ok, operation} <- build_deposit_operation(account, amount) |> Repo.insert(),
+      with {:ok, account} <- Accounts.get_account_with_lock(input.account_id),
+           {:ok, operation} <- create_deposit_operation(account, input.amount),
            {:ok, _account} <- Accounts.increase_balance(account, operation) do
         {:ok, operation}
       else
@@ -28,13 +16,22 @@ defmodule BankingApiChallenge.Operations.Deposits do
       end
     end
     |> Repo.transaction()
+    |> case do
+      {:ok, operation} ->
+        {:ok, operation}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
-  defp build_deposit_operation(%Account{} = account, amount) do
-    Operation.changeset(%{
+  defp create_deposit_operation(%Account{} = account, amount) do
+    %{
       operation_type: "deposit",
       target_account_id: account.id,
       amount: amount
-    })
+    }
+    |> Operation.changeset()
+    |> Repo.insert()
   end
 end
