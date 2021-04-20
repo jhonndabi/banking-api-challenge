@@ -24,7 +24,10 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
       {:ok, account: account}
     end
 
-    test "fail with 400 when account balance is less than withdraw amount", %{conn: conn, account: account} do
+    test "fail with 400 when account balance is less than withdraw amount", %{
+      conn: conn,
+      account: account
+    } do
       input = %{
         account_id: account.id,
         amount: 1_000_01
@@ -33,10 +36,10 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
       conn = post(conn, "/api/v1/withdraw", input)
 
       assert %{
-              "description" => "Invalid input",
-              "type" => "bad_input",
-              "details" => %{"balance" => "must be greater than or equal to %{number}"}
-            } = json_response(conn, 400)
+               "description" => "Invalid input",
+               "type" => "bad_input",
+               "details" => %{"balance" => "must be greater than or equal to %{number}"}
+             } = json_response(conn, 400)
     end
 
     test "successfully withdraw with valid input", %{conn: conn, account: account} do
@@ -48,9 +51,9 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
       conn = post(conn, "/api/v1/withdraw", input)
 
       assert %{
-              "operation_type" => "withdraw",
-              "amount" => 489_99,
-            } = json_response(conn, 200)
+               "operation_type" => "withdraw",
+               "amount" => 489_99
+             } = json_response(conn, 200)
     end
   end
 end
