@@ -24,7 +24,10 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
       {:ok, accounts: %{source: source_account, target: target_account}}
     end
 
-    test "fail with 400 when account balance is less than transfer amount", %{conn: conn, accounts: accounts} do
+    test "fail with 400 when account balance is less than transfer amount", %{
+      conn: conn,
+      accounts: accounts
+    } do
       input = %{
         source_account_id: accounts.source.id,
         target_account_id: accounts.target.id,
@@ -34,10 +37,10 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
       conn = post(conn, "/api/v1/transfer", input)
 
       assert %{
-              "description" => "Invalid input",
-              "type" => "bad_input",
-              "details" => %{"balance" => "must be greater than or equal to %{number}"}
-            } = json_response(conn, 400)
+               "description" => "Invalid input",
+               "type" => "bad_input",
+               "details" => %{"balance" => "must be greater than or equal to %{number}"}
+             } = json_response(conn, 400)
     end
 
     test "successfully transfer with valid input", %{conn: conn, accounts: accounts} do
@@ -50,9 +53,9 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
       conn = post(conn, "/api/v1/transfer", input)
 
       assert %{
-              "operation_type" => "transfer",
-              "amount" => 299_99,
-            } = json_response(conn, 200)
+               "operation_type" => "transfer",
+               "amount" => 299_99
+             } = json_response(conn, 200)
     end
   end
 end

@@ -17,20 +17,20 @@ defmodule BankingApiChallengeWeb.SignUpControllerTest do
         }
       }
 
-    conn = post(conn, "/api/v1/signups", input)
+      conn = post(conn, "/api/v1/signups", input)
 
-    assert %{
-             "user" => %{
-               "id" => _,
-               "name" => _,
-               "email" => _
-             },
-             "account" => %{
-               "id" => _,
-               "agency" => _,
-               "account_number" => _,
-             },
-           } = json_response(conn, 200)
+      assert %{
+               "user" => %{
+                 "id" => _,
+                 "name" => _,
+                 "email" => _
+               },
+               "account" => %{
+                 "id" => _,
+                 "agency" => _,
+                 "account_number" => _
+               }
+             } = json_response(conn, 200)
     end
 
     test "fail with 409 when email is already taken", ctx do

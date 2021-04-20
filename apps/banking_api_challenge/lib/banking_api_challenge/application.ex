@@ -8,7 +8,7 @@ defmodule BankingApiChallenge.Application do
   def start(_type, _args) do
     children = [
       # Start the Ecto repository
-      BankingApiChallenge.Repo,
+      BankingApiChallenge.Repo
       # Start a worker by calling: BankingApiChallenge.Worker.start_link(arg)
       # {BankingApiChallenge.Worker, arg}
     ]

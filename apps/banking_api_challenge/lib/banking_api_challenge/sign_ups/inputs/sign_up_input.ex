@@ -44,7 +44,11 @@ defmodule BankingApiChallenge.SignUps.Inputs.SignUpInput do
     if changes[:email] == changes[:email_confirmation] do
       changeset
     else
-      add_error(changeset, :email_and_confirmation, "Email and email confirmation must be the same")
+      add_error(
+        changeset,
+        :email_and_confirmation,
+        "Email and email confirmation must be the same"
+      )
     end
   end
 end
