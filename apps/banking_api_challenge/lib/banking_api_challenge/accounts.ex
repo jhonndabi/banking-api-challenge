@@ -1,5 +1,6 @@
 defmodule BankingApiChallenge.Accounts do
   alias BankingApiChallenge.Accounts.Schemas.Account
+  alias BankingApiChallenge.Operations.Schemas.Operation
   alias BankingApiChallenge.Users.Schemas.User
   alias BankingApiChallenge.Repo
 
@@ -15,6 +16,22 @@ defmodule BankingApiChallenge.Accounts do
       })
 
     Repo.insert(account)
+  end
+
+  def increase_balance(%Account{} = account, %Operation{} = operation) do
+    account
+    |> update_balance(%{balance: account.balance + operation.amount})
+  end
+
+  def decrease_balance(%Account{} = account, %Operation{} = operation) do
+    account
+    |> update_balance(%{balance: account.balance - operation.amount})
+  end
+
+  defp update_balance(%Account{} = account, params) do
+    account
+    |> Account.changeset(params)
+    |> Repo.update()
   end
 
   defp random_range_to_string(random_range) do
