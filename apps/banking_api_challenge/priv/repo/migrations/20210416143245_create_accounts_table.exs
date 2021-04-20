@@ -6,7 +6,7 @@ defmodule BankingApiChallenge.Repo.Migrations.CreateAccountsTable do
       add :id, :uuid, primary_key: true
       add :agency, :integer, null: false
       add :account_number, :integer, null: false
-      add :balance, :integer, null: false, default: 0
+      add :balance, :bigint, null: false, default: 0
 
       add :user_id, references(:users, type: :uuid), null: false
 
