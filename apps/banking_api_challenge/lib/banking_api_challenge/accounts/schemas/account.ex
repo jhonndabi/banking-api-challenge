@@ -17,8 +17,8 @@ defmodule BankingApiChallenge.Accounts.Schemas.Account do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "accounts" do
-    field :agency, :integer
-    field :account_number, :integer
+    field :agency, :string
+    field :account_number, :string
     field :balance, :integer, default: 0, redact: true
 
     has_many :source_operations, Operation, foreign_key: :source_account_id
