@@ -1,13 +1,13 @@
-defmodule BankingApiChallengeWeb.WithdrawControllerTest do
+defmodule BankingApiChallengeWeb.WithdrawalControllerTest do
   use BankingApiChallengeWeb.ConnCase, async: true
 
-  alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Operations.Deposits
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Users.Schemas.User
   alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Repo
 
-  describe "POST /api/v1/withdraws" do
+  describe "POST /api/v1/withdrawals" do
     setup do
       user =
         %User{name: "random name", email: "#{Ecto.UUID.generate()}@email.com"}
@@ -19,12 +19,12 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
         account_id: account.id,
         amount: 1_000_00
       }
-      |> Operations.make_deposit()
+      |> Deposits.deposit()
 
       {:ok, account: account}
     end
 
-    test "fail with 400 when account balance is less than withdraw amount", %{
+    test "fail with 400 when account balance is less than withdrawal amount", %{
       conn: conn,
       account: account
     } do
@@ -33,7 +33,7 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
         amount: 1_000_01
       }
 
-      conn = post(conn, "/api/v1/withdraws", input)
+      conn = post(conn, "/api/v1/withdrawals", input)
 
       assert %{
                "description" => "Invalid input",
@@ -42,16 +42,16 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
              } = json_response(conn, 400)
     end
 
-    test "successfully withdraw with valid input", %{conn: conn, account: account} do
+    test "successfully withdrawal with valid input", %{conn: conn, account: account} do
       input = %{
         account_id: account.id,
         amount: 489_99
       }
 
-      conn = post(conn, "/api/v1/withdraws", input)
+      conn = post(conn, "/api/v1/withdrawals", input)
 
       assert %{
-               "operation_type" => "withdraw",
+               "operation_type" => "withdrawal",
                "amount" => 489_99
              } = json_response(conn, 200)
     end

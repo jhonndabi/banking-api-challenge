@@ -8,7 +8,7 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
 
   alias BankingApiChallenge.Accounts.Schemas.Account
 
-  @acceptable_operation_types ~w(deposit transfer withdraw)
+  @acceptable_operation_types ~w(deposit transfer withdrawal)
   @required [:operation_type, :amount]
   @optional [:source_account_id, :target_account_id]
 

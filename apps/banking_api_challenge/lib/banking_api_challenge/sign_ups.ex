@@ -5,10 +5,9 @@ defmodule BankingApiChallenge.SignUps do
 
   alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Users.Schemas.User
-  alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.SignUps.Inputs.SignUpInput
   alias BankingApiChallenge.Accounts
-  alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Operations.Deposits
   alias BankingApiChallenge.Users
   alias BankingApiChallenge.Repo
   alias BankingApiChallenge.InputValidation
@@ -41,7 +40,7 @@ defmodule BankingApiChallenge.SignUps do
     fn ->
       with {:ok, user} <- Users.create_user(user),
            {:ok, account} <- Accounts.generate_new_account(user),
-           {:ok, _deposit} <- make_initial_deposit(account) do
+           {:ok, _deposit} <- make_initial_deposit(account.id) do
         {:ok,
          %{
            user: user,
@@ -58,11 +57,18 @@ defmodule BankingApiChallenge.SignUps do
     |> Repo.transaction()
   end
 
-  defp make_initial_deposit(%Account{} = account) do
-    %DepositInput{
-      account_id: account.id,
+  defp make_initial_deposit(account_id) do
+    %{
+      account_id: account_id,
       amount: @initial_deposit_amount
     }
-    |> Operations.make_deposit()
+    |> InputValidation.cast_and_apply(DepositInput)
+    |> case do
+      {:ok, deposit_input} ->
+        Deposits.deposit(deposit_input)
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end
