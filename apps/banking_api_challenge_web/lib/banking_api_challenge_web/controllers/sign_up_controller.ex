@@ -27,7 +27,7 @@ defmodule BankingApiChallengeWeb.SignUpController do
 
       {:error, :email_conflict} ->
         msg = %{type: "conflict", description: "Email already taken"}
-        send_json(conn, 412, msg)
+        send_json(conn, 409, msg)
     end
   end
 
