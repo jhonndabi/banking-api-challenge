@@ -10,5 +10,6 @@ defmodule BankingApiChallengeWeb.Router do
 
     post "/signups", SignUpController, :sign_up
     post "/withdraw", WithdrawController, :withdraw
+    post "/transfer", TransferController, :transfer
   end
 end
