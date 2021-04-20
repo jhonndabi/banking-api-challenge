@@ -8,23 +8,9 @@ defmodule BankingApiChallenge.Operations.Withdrawals do
   require Logger
 
   def withdrawal(%WithdrawInput{} = input) do
-    params = Map.from_struct(input)
-
-    with %{valid?: true} <- WithdrawInput.changeset(params),
-         {:ok, operation} <- do_withdrawal(input.account_id, input.amount) do
-      Logger.info("Succesfully withdrawn from your account")
-
-      {:ok, operation}
-    else
-      %{valid?: false} = changeset -> {:error, changeset}
-      {:error, reason} -> {:error, reason}
-    end
-  end
-
-  defp do_withdrawal(account_id, amount) when is_integer(amount) and amount > 0 do
     fn ->
-      with {:ok, account} <- Accounts.get_account_with_lock(account_id),
-           {:ok, operation} <- build_withdrawal_operation(account, amount) |> Repo.insert(),
+      with {:ok, account} <- Accounts.get_account_with_lock(input.account_id),
+           {:ok, operation} <- create_withdrawal_operation(account, input.amount),
            {:ok, _account} <- Accounts.decrease_balance(account, operation) do
         operation
       else
@@ -32,13 +18,23 @@ defmodule BankingApiChallenge.Operations.Withdrawals do
       end
     end
     |> Repo.transaction()
+    |> case do
+      {:ok, operation} ->
+        Logger.info("Succesfully withdrawn from your account")
+        {:ok, operation}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
-  defp build_withdrawal_operation(%Account{} = account, amount) do
-    Operation.changeset(%{
+  defp create_withdrawal_operation(%Account{} = account, amount) do
+    %{
       operation_type: "withdraw",
       source_account_id: account.id,
       amount: amount
-    })
+    }
+    |> Operation.changeset()
+    |> Repo.insert()
   end
 end

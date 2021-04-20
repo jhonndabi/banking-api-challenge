@@ -1,5 +1,4 @@
 defmodule BankingApiChallenge.Operations do
-
   alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Operations.Inputs.WithdrawInput
   alias BankingApiChallenge.Operations.Inputs.TransferInput
