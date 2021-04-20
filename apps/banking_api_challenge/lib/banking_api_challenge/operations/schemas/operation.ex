@@ -5,7 +5,6 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
   use Ecto.Schema
 
   import Ecto.Changeset
-  import BankingApiChallenge.Changesets
 
   alias BankingApiChallenge.Accounts.Schemas.Account
 
@@ -35,18 +34,5 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
     |> validate_required(@required)
     |> validate_number(:amount, greater_than_or_equal_to: 0)
     |> validate_inclusion(:operation_type, @acceptable_operation_types)
-    |> validate_fields([:target_account, :source_account], &check_operation_has_at_least_one_account/2)
-  end
-
-  defp check_operation_has_at_least_one_account(changes, changeset) do
-    if changes[:target_account] != nil || changes[:source_account] != nil do
-      changeset
-    else
-      add_error(
-        changeset,
-        :account,
-        "At least one account is required, on target_account or source_account"
-      )
-    end
   end
 end

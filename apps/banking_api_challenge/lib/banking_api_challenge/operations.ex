@@ -115,7 +115,7 @@ defmodule BankingApiChallenge.Operations do
   defp build_deposit_operation(%Account{} = account, amount) do
     Operation.changeset(%{
       operation_type: "deposit",
-      target_account: Map.from_struct(account),
+      target_account_id: account.id,
       amount: amount
     })
   end
@@ -123,7 +123,7 @@ defmodule BankingApiChallenge.Operations do
   defp build_withdraw_operation(%Account{} = account, amount) do
     Operation.changeset(%{
       operation_type: "withdraw",
-      source_account: Map.from_struct(account),
+      source_account_id: account.id,
       amount: amount
     })
   end
@@ -131,8 +131,8 @@ defmodule BankingApiChallenge.Operations do
   defp build_transfer_operation(%Account{} = source_account, %Account{} = target_account, amount) do
     Operation.changeset(%{
       operation_type: "transfer",
-      source_account: Map.from_struct(source_account),
-      target_account: Map.from_struct(target_account),
+      source_account_id: source_account.id,
+      target_account_id: target_account.id,
       amount: amount
     })
   end

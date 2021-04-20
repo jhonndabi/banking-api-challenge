@@ -15,5 +15,6 @@ defmodule BankingApiChallenge.Repo.Migrations.CreateAccountsTable do
 
     create index(:accounts, [:user_id])
     create constraint(:accounts, :balance_nonnegative, check: "balance >= 0")
+    create unique_index(:accounts, [:agency, :account_number])
   end
 end

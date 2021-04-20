@@ -9,7 +9,9 @@ defmodule BankingApiChallenge.SignUps do
   alias BankingApiChallenge.SignUps.Inputs.SignUpInput
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Users
   alias BankingApiChallenge.Repo
+  alias BankingApiChallenge.InputValidation
 
   @initial_deposit_amount 1_000_00
 
@@ -23,8 +25,8 @@ defmodule BankingApiChallenge.SignUps do
       }
     }
 
-    with %{valid?: true} = changeset <- User.changeset(params),
-         {:ok, user} <- do_sign_up(changeset) do
+    with {:ok, user} <- InputValidation.cast_and_apply(params, User),
+         {:ok, user} <- do_sign_up(user) do
       user
     else
       %{valid?: false} = changeset -> {:error, changeset}
@@ -35,9 +37,9 @@ defmodule BankingApiChallenge.SignUps do
       {:error, :email_conflict}
   end
 
-  defp do_sign_up(changeset) do
+  defp do_sign_up(%User{} = user) do
     fn ->
-      with {:ok, user} <- Repo.insert(changeset),
+      with {:ok, user} <- Users.create_user(user),
            {:ok, account} <- Accounts.generate_new_account(user),
            {:ok, _deposit} <- make_initial_deposit(account) do
         {:ok, user}
