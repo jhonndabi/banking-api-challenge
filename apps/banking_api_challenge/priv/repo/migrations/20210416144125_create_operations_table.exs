@@ -5,7 +5,7 @@ defmodule BankingApiChallenge.Repo.Migrations.CreateOperationsTable do
     create table(:operations, primary_key: false) do
       add :id, :uuid, primary_key: true
       add :operation_type, :string, null: false
-      add :amount, :integer, null: false, default: 0
+      add :amount, :bigint, null: false, default: 0
 
       add :source_account_id, references(:accounts, type: :uuid)
       add :target_account_id, references(:accounts, type: :uuid)
