@@ -12,7 +12,7 @@ defmodule BankingApiChallenge.Accounts.Schemas.Account do
   @required [:agency, :account_number, :balance, :user_id]
   @optional []
 
-  @derive {Jason.Encoder, except: [:__meta__]}
+  @derive {Jason.Encoder, except: [:__meta__, :operations_source, :operations_target, :user]}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

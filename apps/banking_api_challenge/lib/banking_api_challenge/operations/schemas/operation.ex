@@ -13,7 +13,7 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
   @required [:operation_type, :amount]
   @optional []
 
-  @derive {Jason.Encoder, except: [:__meta__]}
+  @derive {Jason.Encoder, except: [:__meta__, :account_source, :account_target]}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
