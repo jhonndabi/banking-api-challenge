@@ -7,7 +7,7 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
   alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Repo
 
-  describe "POST /api/v1/transfer" do
+  describe "POST /api/v1/transfers" do
     setup do
       source_user = %User{name: "source name", email: "source@email.com"} |> Repo.insert!()
       target_user = %User{name: "target name", email: "target@email.com"} |> Repo.insert!()
@@ -34,7 +34,7 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
         amount: 1_000_01
       }
 
-      conn = post(conn, "/api/v1/transfer", input)
+      conn = post(conn, "/api/v1/transfers", input)
 
       assert %{
                "description" => "Invalid input",
@@ -50,7 +50,7 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
         amount: 299_99
       }
 
-      conn = post(conn, "/api/v1/transfer", input)
+      conn = post(conn, "/api/v1/transfers", input)
 
       assert %{
                "operation_type" => "transfer",
