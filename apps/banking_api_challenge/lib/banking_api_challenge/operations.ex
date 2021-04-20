@@ -6,6 +6,7 @@ defmodule BankingApiChallenge.Operations do
   alias BankingApiChallenge.Operations.Inputs.TransferInput
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Operations.Schemas.Operation
+  alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Repo
 
   require Logger
@@ -26,7 +27,7 @@ defmodule BankingApiChallenge.Operations do
     fn ->
       with {:ok, account} <- get_account_with_lock(account_id),
            {:ok, operation} <- build_deposit_operation(account, amount) |> Repo.insert(),
-           {:ok, _account} <- increase_balance(account, operation.amount) do
+           {:ok, _account} <- Accounts.increase_balance(account, operation) do
         {:ok, operation}
       else
         {:error, reason} -> Repo.rollback(reason)
@@ -53,7 +54,7 @@ defmodule BankingApiChallenge.Operations do
     fn ->
       with {:ok, account} <- get_account_with_lock(account_id),
            {:ok, operation} <- build_withdraw_operation(account, amount) |> Repo.insert(),
-           {:ok, _account} <- decrease_balance(account, amount) do
+           {:ok, _account} <- Accounts.decrease_balance(account, operation) do
         operation
       else
         {:error, reason} -> Repo.rollback(reason)
@@ -82,8 +83,8 @@ defmodule BankingApiChallenge.Operations do
            {:ok, target_account} <- get_account_with_lock(target_account_id),
            {:ok, operation} <-
              build_transfer_operation(target_account, source_account, amount) |> Repo.insert(),
-           {:ok, _account} <- decrease_balance(source_account, amount),
-           {:ok, _account} <- increase_balance(target_account, amount) do
+           {:ok, _account} <- Accounts.decrease_balance(source_account, operation),
+           {:ok, _account} <- Accounts.increase_balance(target_account, operation) do
         operation
       else
         {:error, reason} -> Repo.rollback(reason)
@@ -102,18 +103,6 @@ defmodule BankingApiChallenge.Operations do
       nil -> {:error, :account_not_found}
       _ -> {:ok, account}
     end
-  end
-
-  defp increase_balance(%Account{} = account, amount) when is_integer(amount) and amount > 0 do
-    account
-    |> Account.changeset(%{balance: account.balance + amount})
-    |> Repo.update()
-  end
-
-  defp decrease_balance(%Account{} = account, amount) when is_integer(amount) and amount > 0 do
-    account
-    |> Account.changeset(%{balance: account.balance - amount})
-    |> Repo.update()
   end
 
   defp build_deposit_operation(%Account{} = account, amount) do
