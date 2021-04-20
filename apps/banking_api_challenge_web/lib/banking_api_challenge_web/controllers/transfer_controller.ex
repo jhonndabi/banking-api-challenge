@@ -4,7 +4,7 @@ defmodule BankingApiChallengeWeb.TransferController do
   """
   use BankingApiChallengeWeb, :controller
 
-  alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Operations.Transfers
   alias BankingApiChallenge.Operations.Inputs.TransferInput
   alias BankingApiChallenge.InputValidation
 
@@ -13,7 +13,7 @@ defmodule BankingApiChallengeWeb.TransferController do
   """
   def transfer(conn, params) do
     with {:ok, input} <- InputValidation.cast_and_apply(params, TransferInput),
-         {:ok, user} <- Operations.make_transfer(input) do
+         {:ok, user} <- Transfers.transfer(input) do
       send_json(conn, 200, user)
     else
       {:error, %Ecto.Changeset{errors: errors}} ->
