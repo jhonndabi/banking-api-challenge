@@ -13,8 +13,8 @@ defmodule BankingApiChallengeWeb.SignUpController do
   """
   def sign_up(conn, params) do
     with {:ok, input} <- InputValidation.cast_and_apply(params, SignUpInput),
-         {:ok, user} <- SignUps.sign_up(input) do
-      send_json(conn, 200, user)
+         {:ok, user_and_account} <- SignUps.sign_up(input) do
+      send_json(conn, 200, user_and_account)
     else
       {:error, %Ecto.Changeset{errors: errors}} ->
         msg = %{

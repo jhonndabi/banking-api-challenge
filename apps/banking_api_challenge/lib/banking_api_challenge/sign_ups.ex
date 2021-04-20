@@ -26,8 +26,8 @@ defmodule BankingApiChallenge.SignUps do
     }
 
     with {:ok, user} <- InputValidation.cast_and_apply(params, User),
-         {:ok, user} <- do_sign_up(user) do
-      user
+         {:ok, user_and_account} <- do_sign_up(user) do
+      user_and_account
     else
       %{valid?: false} = changeset -> {:error, changeset}
       {:error, reason} -> {:error, reason}
@@ -42,7 +42,7 @@ defmodule BankingApiChallenge.SignUps do
       with {:ok, user} <- Users.create_user(user),
            {:ok, account} <- Accounts.generate_new_account(user),
            {:ok, _deposit} <- make_initial_deposit(account) do
-        {:ok, user}
+        {:ok, %{user: user, account: %{id: account.id, agency: account.agency, account_number: account.account_number}}}
       else
         {:error, reason} -> Repo.rollback(reason)
       end

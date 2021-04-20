@@ -20,9 +20,16 @@ defmodule BankingApiChallengeWeb.SignUpControllerTest do
     conn = post(conn, "/api/v1/signups", input)
 
     assert %{
-             "id" => _,
-             "name" => _,
-             "email" => _
+             "user" => %{
+               "id" => _,
+               "name" => _,
+               "email" => _
+             },
+             "account" => %{
+               "id" => _,
+               "agency" => _,
+               "account_number" => _,
+             },
            } = json_response(conn, 200)
     end
 
