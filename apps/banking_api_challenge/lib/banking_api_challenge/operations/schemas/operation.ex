@@ -10,7 +10,7 @@ defmodule BankingApiChallenge.Operations.Schemas.Operation do
 
   @acceptable_operation_types ~w(deposit transfer withdraw)
   @required [:operation_type, :amount]
-  @optional []
+  @optional [:source_account_id, :target_account_id]
 
   @derive {Jason.Encoder, except: [:__meta__, :source_account, :target_account]}
 
