@@ -2,16 +2,17 @@ defmodule BankingApiChallenge.OperationsTest do
   use BankingApiChallenge.DataCase, async: true
 
   alias BankingApiChallenge.Operations.Inputs.DepositInput
-  alias BankingApiChallenge.Operations.Inputs.WithdrawInput
+  alias BankingApiChallenge.Operations.Inputs.WithdrawalInput
   alias BankingApiChallenge.Operations.Inputs.TransferInput
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Operations.Withdrawals
   alias BankingApiChallenge.Operations.Deposits
   alias BankingApiChallenge.Users.Schemas.User
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Users.Schemas.User
 
-  describe "make_withdraw/1" do
+  describe "withdrawal/1" do
     setup do
       user =
         %User{name: "random name", email: "#{Ecto.UUID.generate()}@email.com"}
@@ -28,15 +29,15 @@ defmodule BankingApiChallenge.OperationsTest do
       {:ok, account: account}
     end
 
-    test "fail if withdraw amount is greater than account balance", state do
+    test "fail if withdrawal amount is greater than account balance", state do
       account = state[:account]
 
       {:error, result} =
-        %WithdrawInput{
+        %WithdrawalInput{
           account_id: account.id,
           amount: 1_000_01
         }
-        |> Operations.make_withdraw()
+        |> Withdrawals.withdrawal()
 
       assert "must be greater than or equal to 0" in errors_on(result).balance
 
@@ -47,14 +48,14 @@ defmodule BankingApiChallenge.OperationsTest do
       assert account.balance == 1_000_00
     end
 
-    test "successfully make withdraw with valid input", state do
+    test "successfully make withdrawal with valid input", state do
       account = state[:account]
 
-      %WithdrawInput{
+      %WithdrawalInput{
         account_id: account.id,
         amount: 250_00
       }
-      |> Operations.make_withdraw()
+      |> Withdrawals.withdrawal()
 
       query = from(a in Account, where: a.id == ^account.id)
 

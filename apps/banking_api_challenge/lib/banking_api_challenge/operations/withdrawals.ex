@@ -1,5 +1,5 @@
 defmodule BankingApiChallenge.Operations.Withdrawals do
-  alias BankingApiChallenge.Operations.Inputs.WithdrawInput
+  alias BankingApiChallenge.Operations.Inputs.WithdrawalInput
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Operations.Schemas.Operation
   alias BankingApiChallenge.Accounts
@@ -7,7 +7,7 @@ defmodule BankingApiChallenge.Operations.Withdrawals do
 
   require Logger
 
-  def withdrawal(%WithdrawInput{} = input) do
+  def withdrawal(%WithdrawalInput{} = input) do
     fn ->
       with {:ok, account} <- Accounts.get_account_with_lock(input.account_id),
            {:ok, operation} <- create_withdrawal_operation(account, input.amount),
@@ -30,7 +30,7 @@ defmodule BankingApiChallenge.Operations.Withdrawals do
 
   defp create_withdrawal_operation(%Account{} = account, amount) do
     %{
-      operation_type: "withdraw",
+      operation_type: "withdrawal",
       source_account_id: account.id,
       amount: amount
     }

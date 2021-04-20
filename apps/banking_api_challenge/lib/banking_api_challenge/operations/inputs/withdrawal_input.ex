@@ -1,6 +1,6 @@
-defmodule BankingApiChallenge.Operations.Inputs.WithdrawInput do
+defmodule BankingApiChallenge.Operations.Inputs.WithdrawalInput do
   @moduledoc """
-  Withdraw operation data
+  Withdrawal operation data
   """
   use Ecto.Schema
 
@@ -10,7 +10,7 @@ defmodule BankingApiChallenge.Operations.Inputs.WithdrawInput do
 
   @primary_key false
   embedded_schema do
-    field :operation_type, :string, default: "withdraw"
+    field :operation_type, :string, default: "withdrawal"
     field :account_id, :binary_id
     field :amount, :integer
   end

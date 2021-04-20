@@ -1,19 +1,19 @@
-defmodule BankingApiChallengeWeb.WithdrawController do
+defmodule BankingApiChallengeWeb.WithdrawalController do
   @moduledoc """
-  Actions related to the withdraw resource.
+  Actions related to the withdrawal resource.
   """
   use BankingApiChallengeWeb, :controller
 
-  alias BankingApiChallenge.Operations
-  alias BankingApiChallenge.Operations.Inputs.WithdrawInput
+  alias BankingApiChallenge.Operations.Withdrawals
+  alias BankingApiChallenge.Operations.Inputs.WithdrawalInput
   alias BankingApiChallenge.InputValidation
 
   @doc """
-  Make withdraw operation action.
+  Make withdrawal operation action.
   """
-  def withdraw(conn, params) do
-    with {:ok, input} <- InputValidation.cast_and_apply(params, WithdrawInput),
-         {:ok, user} <- Operations.make_withdraw(input) do
+  def withdrawal(conn, params) do
+    with {:ok, input} <- InputValidation.cast_and_apply(params, WithdrawalInput),
+         {:ok, user} <- Withdrawals.withdrawal(input) do
       send_json(conn, 200, user)
     else
       {:error, %Ecto.Changeset{errors: errors}} ->
