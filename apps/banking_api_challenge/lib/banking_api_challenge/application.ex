@@ -9,8 +9,6 @@ defmodule BankingApiChallenge.Application do
     children = [
       # Start the Ecto repository
       BankingApiChallenge.Repo,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: BankingApiChallenge.PubSub}
       # Start a worker by calling: BankingApiChallenge.Worker.start_link(arg)
       # {BankingApiChallenge.Worker, arg}
     ]
