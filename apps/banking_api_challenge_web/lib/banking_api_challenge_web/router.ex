@@ -9,7 +9,7 @@ defmodule BankingApiChallengeWeb.Router do
     pipe_through :api
 
     post "/signups", SignUpController, :sign_up
-    post "/withdraw", WithdrawController, :withdraw
-    post "/transfer", TransferController, :transfer
+    post "/withdraws", WithdrawController, :withdraw
+    post "/transfers", TransferController, :transfer
   end
 end

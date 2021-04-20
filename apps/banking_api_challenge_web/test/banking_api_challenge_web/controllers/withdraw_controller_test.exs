@@ -7,7 +7,7 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
   alias BankingApiChallenge.Operations.Inputs.DepositInput
   alias BankingApiChallenge.Repo
 
-  describe "POST /api/v1/withdraw" do
+  describe "POST /api/v1/withdraws" do
     setup do
       user =
         %User{name: "random name", email: "#{Ecto.UUID.generate()}@email.com"}
@@ -33,7 +33,7 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
         amount: 1_000_01
       }
 
-      conn = post(conn, "/api/v1/withdraw", input)
+      conn = post(conn, "/api/v1/withdraws", input)
 
       assert %{
                "description" => "Invalid input",
@@ -48,7 +48,7 @@ defmodule BankingApiChallengeWeb.WithdrawControllerTest do
         amount: 489_99
       }
 
-      conn = post(conn, "/api/v1/withdraw", input)
+      conn = post(conn, "/api/v1/withdraws", input)
 
       assert %{
                "operation_type" => "withdraw",
