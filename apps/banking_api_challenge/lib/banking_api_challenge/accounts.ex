@@ -9,11 +9,17 @@ defmodule BankingApiChallenge.Accounts do
   def generate_new_account(%User{} = user) do
     account =
       Account.changeset(%{
-        agency: Enum.random(@agency_random_range),
-        account_number: Enum.random(@account_number_random_range),
+        agency: random_range_to_string(@agency_random_range),
+        account_number: random_range_to_string(@account_number_random_range),
         user_id: user.id
       })
 
     Repo.insert(account)
+  end
+
+  defp random_range_to_string(random_range) do
+    random_range
+    |> Enum.random()
+    |> Integer.to_string()
   end
 end
