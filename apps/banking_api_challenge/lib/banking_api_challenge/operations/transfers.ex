@@ -5,11 +5,14 @@ defmodule BankingApiChallenge.Operations.Transfers do
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Repo
 
+  require Logger
+
   def transfer(%TransferInput{} = input) do
     fn ->
       with {:ok, source_account} <- Accounts.get_account_with_lock(input.source_account_id),
            {:ok, target_account} <- Accounts.get_account_with_lock(input.target_account_id),
-           {:ok, operation} <- create_transfer_operation(target_account, source_account, input.amount),
+           {:ok, operation} <-
+             create_transfer_operation(target_account, source_account, input.amount),
            {:ok, _account} <- Accounts.decrease_balance(source_account, operation),
            {:ok, _account} <- Accounts.increase_balance(target_account, operation) do
         operation
@@ -20,6 +23,7 @@ defmodule BankingApiChallenge.Operations.Transfers do
     |> Repo.transaction()
     |> case do
       {:ok, operation} ->
+        Logger.info("Succesfully transfered from your account")
         {:ok, operation}
 
       {:error, reason} ->

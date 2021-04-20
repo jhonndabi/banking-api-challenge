@@ -5,6 +5,8 @@ defmodule BankingApiChallenge.Operations.Deposits do
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Repo
 
+  require Logger
+
   def deposit(%DepositInput{} = input) do
     fn ->
       with {:ok, account} <- Accounts.get_account_with_lock(input.account_id),
@@ -18,6 +20,7 @@ defmodule BankingApiChallenge.Operations.Deposits do
     |> Repo.transaction()
     |> case do
       {:ok, operation} ->
+        Logger.info("Succesfully deposited to your account")
         {:ok, operation}
 
       {:error, reason} ->
