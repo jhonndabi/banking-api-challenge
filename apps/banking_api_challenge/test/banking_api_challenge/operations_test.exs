@@ -6,6 +6,7 @@ defmodule BankingApiChallenge.OperationsTest do
   alias BankingApiChallenge.Operations.Inputs.TransferInput
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Operations.Deposits
   alias BankingApiChallenge.Users.Schemas.User
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Users.Schemas.User
@@ -22,7 +23,7 @@ defmodule BankingApiChallenge.OperationsTest do
         account_id: account.id,
         amount: 1_000_00
       }
-      |> Operations.make_deposit()
+      |> Deposits.deposit()
 
       {:ok, account: account}
     end
@@ -80,7 +81,7 @@ defmodule BankingApiChallenge.OperationsTest do
         account_id: source_account.id,
         amount: 1_000_00
       }
-      |> Operations.make_deposit()
+      |> Deposits.deposit()
 
       {:ok, source_account: source_account, target_account: target_account}
     end

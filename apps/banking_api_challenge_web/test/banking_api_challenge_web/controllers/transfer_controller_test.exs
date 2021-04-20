@@ -1,7 +1,7 @@
 defmodule BankingApiChallengeWeb.TransferControllerTest do
   use BankingApiChallengeWeb.ConnCase, async: true
 
-  alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Operations.Deposits
   alias BankingApiChallenge.Accounts
   alias BankingApiChallenge.Users.Schemas.User
   alias BankingApiChallenge.Operations.Inputs.DepositInput
@@ -19,7 +19,7 @@ defmodule BankingApiChallengeWeb.TransferControllerTest do
         account_id: source_account.id,
         amount: 1_000_00
       }
-      |> Operations.make_deposit()
+      |> Deposits.deposit()
 
       {:ok, accounts: %{source: source_account, target: target_account}}
     end
