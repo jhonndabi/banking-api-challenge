@@ -8,6 +8,8 @@ defmodule BankingApiChallenge.Operations do
   alias BankingApiChallenge.Operations.Schemas.Operation
   alias BankingApiChallenge.Repo
 
+  require Logger
+
   def make_deposit(%DepositInput{} = input) do
     params = Map.from_struct(input)
 
@@ -38,6 +40,8 @@ defmodule BankingApiChallenge.Operations do
 
     with %{valid?: true} <- WithdrawInput.changeset(params),
          {:ok, operation} <- do_make_withdraw(input.account_id, input.amount) do
+      Logger.info("Succesfully withdraw from your account")
+
       {:ok, operation}
     else
       %{valid?: false} = changeset -> {:error, changeset}
