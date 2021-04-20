@@ -1,4 +1,6 @@
 defmodule BankingApiChallenge.Accounts do
+  import Ecto.Query
+
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Operations.Schemas.Operation
   alias BankingApiChallenge.Users.Schemas.User
@@ -16,6 +18,18 @@ defmodule BankingApiChallenge.Accounts do
       })
 
     Repo.insert(account)
+  end
+
+  def get_account_with_lock(account_id) do
+    account =
+      Account
+      |> lock("FOR UPDATE")
+      |> Repo.get(account_id)
+
+    case account do
+      nil -> {:error, :account_not_found}
+      _ -> {:ok, account}
+    end
   end
 
   def increase_balance(%Account{} = account, %Operation{} = operation) do
