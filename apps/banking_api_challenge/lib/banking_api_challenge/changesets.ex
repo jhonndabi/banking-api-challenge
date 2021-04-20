@@ -5,15 +5,6 @@ defmodule BankingApiChallenge.Changesets do
 
   import Ecto.Changeset
 
-  @email_regex ~r<\A[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\z>
-
-  @doc """
-  Validate a given field contains a valid email.
-  """
-  def validate_email(changeset, field) do
-    validate_format(changeset, field, @email_regex)
-  end
-
   @doc """
   Given a valid changeset, applies function with the changes of the given fields.
   """
