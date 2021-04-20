@@ -1,4 +1,4 @@
-defmodule BankingApiChallengeWeb.InputValidation do
+defmodule BankingApiChallenge.InputValidation do
   @moduledoc """
   Validates a given map of params with the given schema.
   """

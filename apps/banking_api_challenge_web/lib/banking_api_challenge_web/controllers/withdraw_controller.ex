@@ -1,19 +1,19 @@
-defmodule BankingApiChallengeWeb.SignUpController do
+defmodule BankingApiChallengeWeb.WithdrawController do
   @moduledoc """
-  Actions related to the sign up resource.
+  Actions related to the withdraw resource.
   """
   use BankingApiChallengeWeb, :controller
 
-  alias BankingApiChallenge.SignUps
-  alias BankingApiChallenge.SignUps.Inputs.SignUpInput
+  alias BankingApiChallenge.Operations
+  alias BankingApiChallenge.Operations.Inputs.WithdrawInput
   alias BankingApiChallenge.InputValidation
 
   @doc """
-  Sign up user action.
+  Make withdraw operation action.
   """
-  def sign_up(conn, params) do
-    with {:ok, input} <- InputValidation.cast_and_apply(params, SignUpInput),
-         {:ok, user} <- SignUps.sign_up(input) do
+  def withdraw(conn, params) do
+    with {:ok, input} <- InputValidation.cast_and_apply(params, WithdrawInput),
+         {:ok, user} <- Operations.make_withdraw(input) do
       send_json(conn, 200, user)
     else
       {:error, %Ecto.Changeset{errors: errors}} ->
@@ -24,10 +24,6 @@ defmodule BankingApiChallengeWeb.SignUpController do
         }
 
         send_json(conn, 400, msg)
-
-      {:error, :email_conflict} ->
-        msg = %{type: "conflict", description: "Email already taken"}
-        send_json(conn, 412, msg)
     end
   end
 
