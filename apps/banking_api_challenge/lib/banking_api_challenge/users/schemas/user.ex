@@ -5,7 +5,6 @@ defmodule BankingApiChallenge.Users.Schemas.User do
   use Ecto.Schema
 
   import Ecto.Changeset
-  import BankingApiChallenge.Changesets
 
   alias BankingApiChallenge.Accounts.Schemas.Account
   alias BankingApiChallenge.Credentials.Schemas.Password
@@ -35,6 +34,5 @@ defmodule BankingApiChallenge.Users.Schemas.User do
     |> cast_assoc(:password_credential, required: true)
     |> validate_required(@required)
     |> validate_length(:name, min: @name_min_length)
-    |> validate_email(:email)
   end
 end
