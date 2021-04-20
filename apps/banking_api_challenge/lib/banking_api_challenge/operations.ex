@@ -63,7 +63,7 @@ defmodule BankingApiChallenge.Operations do
 
     with %{valid?: true} <- TransferInput.changeset(params),
          {:ok, operation} <-
-           do_make_transfer(input.account_source_id, input.account_target_id, input.amount) do
+           do_make_transfer(input.source_account_id, input.target_account_id, input.amount) do
       {:ok, operation}
     else
       %{valid?: false} = changeset -> {:error, changeset}
@@ -71,15 +71,15 @@ defmodule BankingApiChallenge.Operations do
     end
   end
 
-  defp do_make_transfer(account_source_id, account_target_id, amount)
+  defp do_make_transfer(source_account_id, target_account_id, amount)
        when is_integer(amount) and amount > 0 do
     fn ->
-      with {:ok, account_source} <- get_account_with_lock(account_source_id),
-           {:ok, account_target} <- get_account_with_lock(account_target_id),
+      with {:ok, source_account} <- get_account_with_lock(source_account_id),
+           {:ok, target_account} <- get_account_with_lock(target_account_id),
            {:ok, operation} <-
-             build_transfer_operation(account_target, account_source, amount) |> Repo.insert(),
-           {:ok, _account} <- decrease_balance(account_source, amount),
-           {:ok, _account} <- increase_balance(account_target, amount) do
+             build_transfer_operation(target_account, source_account, amount) |> Repo.insert(),
+           {:ok, _account} <- decrease_balance(source_account, amount),
+           {:ok, _account} <- increase_balance(target_account, amount) do
         operation
       else
         {:error, reason} -> Repo.rollback(reason)
@@ -115,7 +115,7 @@ defmodule BankingApiChallenge.Operations do
   defp build_deposit_operation(%Account{} = account, amount) do
     Operation.changeset(%{
       operation_type: "deposit",
-      account_target: Map.from_struct(account),
+      target_account: Map.from_struct(account),
       amount: amount
     })
   end
@@ -123,16 +123,16 @@ defmodule BankingApiChallenge.Operations do
   defp build_withdraw_operation(%Account{} = account, amount) do
     Operation.changeset(%{
       operation_type: "withdraw",
-      account_source: Map.from_struct(account),
+      source_account: Map.from_struct(account),
       amount: amount
     })
   end
 
-  defp build_transfer_operation(%Account{} = account_source, %Account{} = account_target, amount) do
+  defp build_transfer_operation(%Account{} = source_account, %Account{} = target_account, amount) do
     Operation.changeset(%{
       operation_type: "transfer",
-      account_source: Map.from_struct(account_source),
-      account_target: Map.from_struct(account_target),
+      source_account: Map.from_struct(source_account),
+      target_account: Map.from_struct(target_account),
       amount: amount
     })
   end
